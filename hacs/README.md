@@ -30,8 +30,8 @@ During the startup there will be a progressbar indicating that it's scanning for
 
 ***
 ### Licenses
-Additional licenses for third-party components of this addon are available as part of the [LICENSE.md](https://github.com/TenySmart/Addons/blob/master/hacs/docs/LICENSE.md) file.
+Additional licenses for third-party components of this addon are available as part of the [LICENSE.md](https://github.com/TenySmart/Addons/blob/main/hacs/docs/LICENSE.md) file.
 ### Credits
 - [Home Assistant Community Store](https://hacs.xyz)
 
-[logo]: https://github.com/TenySmart/HassioAddon/raw/master/hacs/icon.png
+[logo]: https://github.com/TenySmart/HassioAddon/raw/main/hacs/icon.png

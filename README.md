@@ -127,4 +127,4 @@ This repository is credit to MagnetVN, LLC
 
 Copyright (c) 2019, ttvtien
 
-[logo]: https://github.com/TenySmart/HassioAddon/raw/master/images/Logo.png
+[logo]: https://github.com/TenySmart/HassioAddon/raw/main/images/Logo.png
