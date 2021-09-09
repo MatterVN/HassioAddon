@@ -3,7 +3,7 @@
 This add-on is just a shortcut to install [hacs](https://hacs.xyz). 
 
 ## Installation
-1. Add the repository URL via the Hassio Add-on Store Tab: **https://github.com/TenySmart/Addons**
+1. Add the repository URL via the Hassio Add-on Store Tab: **https://github.com/TenySmart/HassioAddon**
 
 2. Install and start the `Hass.io Community Store` add-on **once**. 
 
