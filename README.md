@@ -45,17 +45,16 @@ Developer info [zigbee2mqtt.io](https://www.zigbee2mqtt.io/).
 Control TTLock and get lock status. This addon based on tonyldo Addon with improvement on auto token refresh.
 Need `Gateway G2` and TTLOCK API token in order to work.
 Get Token [intructions](https://github.com/tonyldo/ttlockio)
-
-Developer info [TTLock2MQTT](https://github.com/tonyldo/tonyldo-hassio-addons)
+Developer info [TTLock2MQTT](https://github.com/TenySmart/TTLock2MQTT)
 
 
 ### ModbusTCP2MQTT
 This addon support SMA & Sungrow Solar Inverter to publish data to MQTT Broker. 
-This add on based on [SolariOT](https://github.com/meltaxa/solariot)
+This add on based on [ModbusTCP2MQTT](https://github.com/TenySmart/ModbusTCP2MQTT)
 
 
 # Custom Component
-**NOTICE**: It's recommend to use **Component Store Add-on** to install `custom components`. Component installed manually will not be mananged in component store.
+**NOTICE**: It's recommend to use **Community Store Add-on** to install `custom components`. Component installed manually will not be mananged in component store.
 
 If you found useful component and want to share, don't hesitate let us know.
 
