@@ -1,6 +1,6 @@
 {
   "name": "Hass.io Community Store",
-  "version": "1.15.2",
+  "version": "1.24.5",
   "slug": "hacs",
   "description": "Manage all your custom integration (components) and plugin (lovelace elements) with ease.",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
