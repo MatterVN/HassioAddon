@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 1.25.0-1
 Updated Zigbee2MQTT to version 1.25.0
 ⚠️ Breaking changes
@@ -6,6 +7,30 @@ Most Zigbee2MQTT configuration is now done in Zigbee2MQTT directly (either via t
 As Zigbee2MQTT won't start with an MQTT server or serial adapter you must configure these through the add-on configuration page before you can start Zigbee2MQTT for the first time.
 
 Existing installations should be able to safely remove the Zigbee2MQTT configuration from the add-on configuration as these values should have already been persisted to the configuration file
+=======
+## 1.24.0-1
+- Updated Zigbee2MQTT to version [`1.24.0`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.24.0)
+
+## 1.23.0-1
+- Updated Zigbee2MQTT to version [`1.23.0`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.23.0)
+
+## 1.22.2-1
+- Updated Zigbee2MQTT to version [`1.22.2`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.22.2)
+
+## 1.22.1-1
+- Updated Zigbee2MQTT to version [`1.22.1`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.22.1)
+
+## 1.22.0-3
+- Add availability configuration
+
+## 1.22.0-2
+- Fix availability configuration
+
+## 1.22.0-1
+- Updated Zigbee2MQTT to version [`1.22.0`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.22.0)
+
+## 1.21.2-1
+- Updated Zigbee2MQTT to version [`1.21.2`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.21.2)
 
 ## 1.22.1-1
 - Updated Zigbee2MQTT to version [`1.22.1`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.22.1)
