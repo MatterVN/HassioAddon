@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 1.25.0-1
 Updated Zigbee2MQTT to version 1.25.0
 ⚠️ Breaking changes
