@@ -1,6 +1,6 @@
 {
   "name": "Zigbee2mqtt",
-  "version": "1.25.0-1",
+  "version": "1.26.0-1",
   "slug": "zigbee2mqtt",
   "description": "Use your ZigBee devices without the vendor's bridge or gateway",
   "uart": true,
@@ -24,10 +24,12 @@
     "config:rw"
   ],
   "ports": {
-    "8485/tcp": 8485
+    "8485/tcp": 8485,
+    "8099/tcp": null
   },
   "ports_description": {
-    "8485/tcp": "Socat tcp-listen port"
+    "8485/tcp": "Socat tcp-listen port",
+    "8099/tcp": "Frontend tcp-listen port"
   },
   "options": {
     "data_path": "/config/zigbee2mqtt",
