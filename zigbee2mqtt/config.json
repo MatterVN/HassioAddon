@@ -1,5 +1,5 @@
 {
-  "name": "Zigbee2mqtt",
+  "name": "Zigbee2MQTT",
   "version": "1.26.0-1",
   "slug": "zigbee2mqtt",
   "description": "Use your ZigBee devices without the vendor's bridge or gateway",
@@ -17,6 +17,7 @@
     "i386"
   ],
   "boot": "auto",
+  "init": false,
   "ingress": true,
   "panel_icon": "mdi:zigbee",
   "map": [
@@ -64,7 +65,7 @@
     },
     "serial": {
       "port": "str?",
-      "adapter": "match(^zstack|deconz|zigate|ezsp)?",
+      "adapter": "match(zstack|deconz|zigate|ezsp)?",
       "baudrate": "int?",
       "rtscts": "bool?"
     }
