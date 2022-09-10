@@ -1,6 +1,6 @@
 {
   "name": "Zigbee2MQTT",
-  "version": "1.26.0-1",
+  "version": "1.27.2-1",
   "slug": "zigbee2mqtt",
   "description": "Use your ZigBee devices without the vendor's bridge or gateway",
   "uart": true,
@@ -19,6 +19,7 @@
   "boot": "auto",
   "init": false,
   "ingress": true,
+  "timeout": 30,
   "panel_icon": "mdi:zigbee",
   "map": [
     "share:rw",
@@ -45,7 +46,6 @@
     "serial": {}
   },
   "schema": {
-    "zigbee_shepherd_devices": "bool?",
     "zigbee_herdsman_debug": "bool?",
     "data_path": "str",
     "socat": {
