@@ -7,7 +7,7 @@ This repository contains Hass.io add-ons. All add-ons in this repository are tes
 ### Installation
 1. Navigate in your Home Assistant frontend to <kbd>Supervisor</kbd> -> <kbd>Add-on Store</kbd>.
 
-2. Click the 3-dots menu at upper right <kbd>...</kbd> > <kbd>Repositories</kbd> and add this repository's URL: [https://github.com/TenySmart/HassioAddon](https://github.com/TenySmart/HassioAddon)
+2. Click the 3-dots menu at upper right <kbd>...</kbd> > <kbd>Repositories</kbd> and add this repository's URL: [https://github.com/MatterVN/HassioAddon](https://github.com/MatterVN/HassioAddon)
 
    <img src="images/add_repo.png" width="300"/>
 
@@ -45,12 +45,12 @@ Developer info [zigbee2mqtt.io](https://www.zigbee2mqtt.io/).
 Control TTLock and get lock status. This addon based on tonyldo Addon with improvement on auto token refresh.
 Need `Gateway G2` and TTLOCK API token in order to work.
 Get Token [intructions](https://github.com/tonyldo/ttlockio)
-Developer info [TTLock2MQTT](https://github.com/TenySmart/TTLock2MQTT)
+Developer info [TTLock2MQTT](https://github.com/MatterVN/TTLock2MQTT)
 
 
 ### ModbusTCP2MQTT
 This addon support SMA & Sungrow Solar Inverter to publish data to MQTT Broker. 
-This add on based on [ModbusTCP2MQTT](https://github.com/TenySmart/ModbusTCP2MQTT)
+This add on based on [ModbusTCP2MQTT](https://github.com/MatterVN/ModbusTCP2MQTT)
 
 
 # Custom Component
@@ -59,7 +59,7 @@ This add on based on [ModbusTCP2MQTT](https://github.com/TenySmart/ModbusTCP2MQT
 If you found useful component and want to share, don't hesitate let us know.
 
 ### Simple Installation
-1. Make sure you've the [Community Store](https://github.com/TenySmart/HassioAddon/tree/main/hacs) installed and working.
+1. Make sure you've the [Community Store](https://github.com/MatterVN/HassioAddon/tree/main/hacs) installed and working.
 2. Navigate to the Store (on the menu bar), select Store 
 3. Search and select **component** you want and install.
 4. Refer to component documents for configure and usage
@@ -79,12 +79,12 @@ Use Custom Component Store to update your card
 #### SmartIR
 Modify from SmartIR for better service `media_player.select_source` 
 
-You can find the [details here](https://github.com/TenySmart/smartIR)
+You can find the [details here](https://github.com/MatterVN/smartIR)
 
 #### Zing MP3
 Play media on zing.mp3.vn. Offer 2 services: `zing_mp3.play` and `zing_mp3.play_top100`
 
-You can find the [details here](https://github.com/TenySmart/zing_mp3)
+You can find the [details here](https://github.com/MatterVN/zing_mp3)
 
 
 
@@ -92,7 +92,7 @@ You can find the [details here](https://github.com/TenySmart/zing_mp3)
 If you found useful card and want to share, don't hesitate let us know.
 
 ### Installation
-1. Make sure you've the [Community Store](https://github.com/TenySmart/HassioAddon/tree/main/hacs) installed and working.
+1. Make sure you've the [Community Store](https://github.com/MatterVN/HassioAddon/tree/main/hacs) installed and working.
 2. Navigate to the Store (on the menu bar), select Store 
 3. Search and select **cards** you want and install.
 4. Add reference to **cards** inside your `ui-lovelace.yaml` or at the top of the *raw config editor UI*. Instruction 

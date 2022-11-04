@@ -1,3 +1,3 @@
-## 1.24.5
-- Updated HACS 1.15.2
+## 1.28.3
+- Updated HACS 1.28.3
 

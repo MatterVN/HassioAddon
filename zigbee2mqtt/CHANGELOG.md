@@ -1,3 +1,10 @@
+## 1.28.1-1
+Updated Zigbee2MQTT to version 1.28.1
+
+## 1.28.0-1
+Updated Zigbee2MQTT to version 1.28.0
+Fix Can't open config file at null/configuration.yaml error
+
 ## 1.27.2-1
 - Updated Zigbee2MQTT to version [`1.27.2`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.27.2)
 
