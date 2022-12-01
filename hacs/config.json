@@ -1,10 +1,10 @@
 {
   "name": "Hass.io Community Store",
-  "version": "1.28.3",
+  "version": "1.28.4",
   "slug": "hacs",
   "description": "Manage all your custom integration (components) and plugin (lovelace elements) with ease.",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
-  "url": "https://github.com/TenySmart/HassioAddon/tree/master/hacs",
+  "url": "https://github.com/MatterVN/HassioAddon/tree/master/hacs",
   "startup": "once",
   "boot": "manual",
   "auth_api": true,

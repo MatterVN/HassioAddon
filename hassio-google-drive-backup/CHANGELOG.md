@@ -1,4 +1,7 @@
 =======
+## v0.109.2 [2022-11-16]
+Fixes a bug causing backups in Google Drive to be erroneously deleted when "Max Backups in Google Drive" is 0 and "Delete After Upload" is enabled.
+
 ## v0.108.4 [2022-08-22]
 Fixed an error causing "Undefined" to show up for addon descriptions.
 Fixed an error preventing addon thumbnails from showing up.
