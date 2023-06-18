@@ -1,4 +1,12 @@
-=======
+## v0.110.4
+Fixes an issue causing authentication to fail because of whitespace on the latest Home Assistant core.
+## v0.110.3
+Fix an error causing "Days Between Backups" to be ignored when "Time of Day" for a backup is set.
+Fix a bug causing some timezones to make the addon to fail to start.
+## 0.110.2
+Changes:
+Fix a potential cause of SSL errors when communicating with Google Drive
+Fix a bug causing backups to be requested indefinitely if scheduled during DST transitions.
 ## v0.109.2 [2022-11-16]
 Fixes a bug causing backups in Google Drive to be erroneously deleted when "Max Backups in Google Drive" is 0 and "Delete After Upload" is enabled.
 

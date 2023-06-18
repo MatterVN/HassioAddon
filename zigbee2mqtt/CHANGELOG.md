@@ -1,3 +1,7 @@
+## 1.31.2-1
+- Updated Zigbee2MQTT to version 1.31.2
+## 1.31.1-1
+- Updated Zigbee2MQTT to version 1.31.1
 ## 1.31.0-1
 - Updated Zigbee2MQTT to version [`1.31.0`](https://github.com/Koenkk/zigbee2mqtt/releases/tag/1.31.0)
 ## 1.30.4-1
