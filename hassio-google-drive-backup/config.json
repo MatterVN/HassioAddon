@@ -1,13 +1,13 @@
 {
   "name": "Home Assistant Google Drive Backup",
-  "version": "0.111.1",
+  "version": "0.112.1",
   "slug": "hassio_google_drive_backup",
   "description": "Automatically manage backups between Home Assistant and Google Drive",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "url": "https://github.com/sabeechen/hassio-google-drive-backup",
   "homeassistant_api": true,
   "hassio_api": true,
-  "hassio_role": "manager",
+  "hassio_role": "admin",
   "auth_api": true,
   "ingress": true,
   "panel_icon": "mdi:cloud",
@@ -24,6 +24,7 @@
     "days_between_backups": "float(0,)?",
     "ignore_other_backups": "bool?",
     "ignore_upgrade_backups": "bool?",
+    "backup_storage": "str?",
 
     "delete_after_upload": "bool?",
     "delete_before_new_backup": "bool?",
@@ -37,6 +38,8 @@
     "backup_time_of_day": "match(^[0-2]\\d:[0-5]\\d$)?",
     "specify_backup_folder": "bool?",
     "warn_for_low_space": "bool?",
+    "watch_backup_directory": "bool?",
+    "trace_requests": "bool?",
 
     "generational_days": "int(0,)?",
     "generational_weeks": "int(0,)?",
@@ -54,6 +57,7 @@
     "backup_password": "str?",
     "exclude_folders": "str?",
     "exclude_addons": "str?",
+    "exclude_ha_database": "bool?",
     "stop_addons": "str?",
     "disable_watchdog_when_stopping": "bool?",
     "expose_extra_server": "bool?",
@@ -70,10 +74,12 @@
     "accent_color": "match(^(#[0-9ABCDEFabcdef]{6}|)$)?",
 
     "max_sync_interval_seconds": "float(300,)?",
+    "default_sync_interval_variation": "float(0,1)?",
     "port": "int(0,)?",
     "debugger_port": "int(100,)?",
     "log_level": "list(DEBUG|TRACE|INFO|WARN|CRITICAL|WARNING)?",
     "console_log_level": "list(DEBUG|TRACE|INFO|WARN|CRITICAL|WARNING)?",
+    "max_backoff_seconds": "int(3600,)?",
 
     "max_snapshots_in_hassio": "int(0,)?",
     "max_snapshots_in_google_drive": "int(0,)?",
@@ -81,13 +87,18 @@
     "ignore_other_snapshots": "bool?",
     "ignore_upgrade_snapshots": "bool?",
     "delete_before_new_snapshot": "bool?",
+    "delete_ignored_after_days": "float(0,)?",
     "snapshot_name": "str?",
     "snapshot_time_of_day": "match(^[0-2]\\d:[0-5]\\d$)?",
     "specify_snapshot_folder": "bool?",
     "notify_for_stale_snapshots": "bool?",
     "enable_snapshot_stale_sensor": "bool?",
     "enable_snapshot_state_sensor": "bool?",
-    "snapshot_password": "str?" 
+    "snapshot_password": "str?",
+    "maximum_upload_chunk_bytes": "float(262144,)?",
+    "ha_reporting_interval_seconds": "int(1,)?",
+
+    "upload_limit_bytes_per_second": "float(0,)?"
   },
   "ports": {
     "1627/tcp": 1627
@@ -95,5 +106,5 @@
   "ports_description": {
     "1627/tcp": "Direct access to the add-on without ingress.  Must be enabled in the settings, see 'expose_extra_server'."
   },
-  "image": "sabeechen/hassio-google-drive-backup-{arch}"
+  "image": "ghcr.io/sabeechen/hassio-google-drive-backup-{arch}"
 }

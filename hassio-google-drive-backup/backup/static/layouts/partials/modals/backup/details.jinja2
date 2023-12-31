@@ -1,0 +1,631 @@
+<div id="details_modal" class="modal modal-fixed-footer" style="max-width: 900px;">
+  <div id="backup-source-container" class="backup-source-container card default-hidden" data-slug='slug'
+    data-source='source' data-source-name='fake_source_name'>
+    <div class="card-content">
+      <span class="detail-badge">
+        <svg class="source-icon" viewBox="0 0 24 24">
+          <use xlink:href="#dummy" />
+        </svg>
+        <span class="detail-source-name" style="min-width: 110px; display: inline-block;">Source Name</span>
+      </span>
+      <a class="delete-initial btn-flat danger-btn" href="#!" onclick="deleteButtonClick(this);">
+        <i class="material-icons">delete</i>Delete
+      </a>
+      <a href="#!" class="never-delete btn-flat" onclick="neverDeleteButtonClick(this);">
+        <i class="material-icons">lock</i>Never Delete
+      </a>
+      <a href="#!" class="allow-delete btn-flat" onclick="allowDeleteButtonClick(this);">
+        <i class="material-icons">lock_open</i>Allow Deletion
+      </a>
+      <a class="delete-confirm btn-flat high-vis-danger-btn default-hidden" href="#!"
+        onclick="confirmDeleteButtonClick(this);">
+        <i class="material-icons">delete_forever</i>Confirm Delete
+      </a>
+      <a class="dont-ignore-button btn-flat" href="#!"
+        onclick="dontIgnoreButtonClick(this);">
+        <i class="material-icons">add</i>Don't Ignore
+      </a>
+      <a class="delete-cancel btn-flat default-hidden" href="#!" onclick="deleteButtonCancel(this);">
+        <i class="material-icons">close</i>Cancel
+      </a>
+      <div class="preloader-wrapper inline">
+        <div class="spinner-layer">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div>
+          <div class="gap-patch">
+            <div class="circle"></div>
+          </div>
+          <div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+      <div class="retain-warning small sub-detail indent">
+        <i class="material-icons">lock</i>
+        <span>This backup will not be deleted or count against the total backups kept in <span
+            class="detail-source-name">Source Name</span> until you allow it manually.</span>
+      </div>
+      <div class="delete-warning small sub-detail indent">
+        <i class="material-icons">warning</i>
+        <span>This backup will be deleted from <span class="detail-source-name">Source Name</span> as soon as a new
+          backup is made.</span>
+      </div>
+      <div class="ignore-warning small sub-detail indent">
+        <i class="material-icons">warning</i>
+        <span>This backup is being ignored because you configured the addon to ignore some types of backups
+          in your addon settings.  It won't count against the backups stored in Home Assistant and it will never be automatically uploaded or deleted.  Click "Don't Ignore" to have the addon track, upload, and eventually delete this backup.</span>
+      </div>
+      
+    </div>
+  </div>
+  <script type="text/javascript">
+    function deleteButtonClick(element) {
+      let container = $(element).closest('.backup-source-container');
+      container.data('processing', true);
+      $(".delete-initial", container).addClass('disabled');
+      $(".never-delete", container).addClass('default-hidden');
+      $(".delete-confirm", container).removeClass('default-hidden');
+      $(".delete-confirm", container).removeClass('disabled');
+      $(".delete-cancel", container).removeClass('default-hidden');
+    }
+
+    function deleteButtonCancel(element) {
+      let container = $(element).closest('.backup-source-container');
+      $(".delete-initial", container).removeClass('disabled');
+      $(".never-delete", container).removeClass('default-hidden');
+      $(".delete-confirm", container).addClass('default-hidden');
+      $(".delete-cancel", container).addClass('default-hidden');
+      container.data('processing', false);
+    }
+
+    function confirmDeleteButtonClick(element) {
+      let container = $(element).closest('.backup-source-container');
+      container.data('processing', true);
+      let source = container.data('source');
+      $(".preloader-wrapper", container).addClass("active");
+      $(".delete-confirm", container).addClass('disabled');
+      $(".delete-cancel", container).addClass('default-hidden');
+      // Send the delete request
+      data = {
+        'slug': source.slug,
+        'sources': [source.key],
+      };
+      postJson(
+        "deleteSnapshot",
+        data,
+        function () { 
+          deleteSuccessful(container); 
+        },
+        function () { 
+          container.data('processing', false); 
+          configureBackupSource(container); 
+        },
+        "Deleting backup from " + sourceToName(source.key));
+    }
+
+    function neverDeleteButtonClick(element) {
+      let container = $(element).closest('.backup-source-container');
+      container.data('processing', true);
+      let source = container.data('source');
+      $(".never-delete", container).addClass('disabled');
+      $(".preloader-wrapper", container).addClass("active");
+      data = {
+        'slug': source.slug,
+        'sources': {}
+      };
+      data['sources'][source.key] = true;
+      let success = function (info) { neverDeleteCompleted(container, true); };
+      let fail = function (info) { neverDeleteCompleted(container, false); };
+      postJson("retain", data, success, fail, "Updating backup... ");
+    }
+
+    function dontIgnoreButtonClick(element) {
+      let container = $(element).closest('.backup-source-container');
+      container.data('processing', true);
+      let source = container.data('source');
+      $(".dont-ignore-button", container).addClass('disabled');
+      $(".preloader-wrapper", container).addClass("active");
+      data = {
+        'slug': source.slug,
+        'ignore': false,
+      };
+      let success = function (info) { ignoreCompleted(container, false); };
+      let fail = function (info) { ignoreCompleted(container, true); };
+      postJson("ignore", data, success, fail, "Updating backup... ");
+    }
+
+    function ignoreCompleted(container, ignored) {
+      let source = container.data('source');
+      container.data('processing', false);
+      source.ignored = ignored;
+      refreshstats();
+
+      // Get the updated source info
+      configureBackupSource(container);
+    }
+
+    function allowDeleteButtonClick(element) {
+      let container = $(element).closest('.backup-source-container');
+      container.data('processing', true);
+      let source = container.data('source');
+      $(".allow-delete", container).addClass('disabled');
+      $(".preloader-wrapper", container).addClass("active");
+      data = {
+        'slug': source.slug,
+        'sources': {}
+      };
+      data['sources'][source.key] = false;
+      let success = function (info) { neverDeleteCompleted(container, false); };
+      let fail = function (info) { neverDeleteCompleted(container, true); };
+      postJson("retain", data, success, fail, "Updating backup... ");
+    }
+
+    function neverDeleteCompleted(container, retained) {
+      let source = container.data('source');
+      container.data('processing', false);
+      source.retained = retained;
+      container.data('source', source);
+      container.data('source-name', source.key);
+      refreshstats();
+
+      // Get the updated source info
+      configureBackupSource(container);
+    }
+
+    function deleteSuccessful(element) {
+      let container = $(element);
+      container.data('processing', false);
+      let parent = container.closest(".detail-backup-sources");
+      container.remove();
+
+      if (parent.children().length == 0) {
+        M.Modal.getInstance(document.getElementById("details_modal")).close();
+      }
+      refreshstats();
+    }
+
+    function configureBackupSource(container) {
+      let source = container.data('source');
+      if (container.data('processing')) {
+        return;
+      }
+      $(".detail-source-name", container).html(sourceToName(source.key));
+      $("use", container).attr('xlink:href', "#" + last_data.sources[source.key].icon);
+      $(".delete-confirm", container).removeClass('disabled');
+      $(".allow-delete", container).removeClass('disabled');
+      $(".never-delete", container).removeClass('disabled');
+      $(".preloader-wrapper", container).removeClass("active");
+      $(".delete-initial", container).removeClass("disabled");
+      $(".dont-ignore-button").removeClass("disabled");
+      if (source.retained) {
+        $(".delete-initial", container).addClass('default-hidden');
+        $(".never-delete", container).addClass('default-hidden');
+        $(".delete-confirm", container).addClass('default-hidden');
+        $(".delete-cancel", container).addClass('default-hidden');
+        $(".allow-delete", container).removeClass('default-hidden');
+        $(".retain-warning", container).removeClass('default-hidden');
+      } else {
+        $(".delete-initial", container).removeClass('default-hidden');
+        $(".never-delete", container).removeClass('default-hidden');
+        $(".delete-confirm", container).addClass('default-hidden');
+        $(".delete-cancel", container).addClass('default-hidden');
+        $(".allow-delete", container).addClass('default-hidden');
+        $(".retain-warning", container).addClass('default-hidden');
+      }
+
+      if (source.delete_next) {
+        $(".delete-warning", container).removeClass('default-hidden');
+      } else {
+        $(".delete-warning", container).addClass('default-hidden');
+      }
+
+      if (source.ignored) {
+        $(".ignore-warning", container).removeClass('default-hidden');
+        $(".dont-ignore-button", container).removeClass('default-hidden');
+        $(".never-delete", container).addClass('default-hidden');
+      } else {
+        $(".ignore-warning", container).addClass('default-hidden');
+        $(".dont-ignore-button", container).addClass('default-hidden');
+      }
+    }
+
+    function setValuesForBackupUpdate(backup) {
+      let sources_container = $('.detail-backup-sources');
+      let rendered_sources = $(".backup-source-container", sources_container);
+      let modal = $('#details_modal');
+
+      $(".detail-comment").html(backup.note);
+
+      // Update values for any sources that have changed.
+      let existing_sources = {};
+      rendered_sources.each(function () {
+        existing_sources[$(this).data('source-name')] = $(this);
+      });
+
+      let new_sources = new Set();
+      for (let i = 0; i < backup.sources.length; i++) {
+        let source = backup.sources[i];
+        if (existing_sources[source.key] == undefined) {
+          // Add the source info to the list
+          let template = $('#backup-source-container').clone();
+          template.attr('id', 'detail-source-' + source.key);
+          template.data('source', source);
+          template.data('source-name', source.key);
+          template.data('processing', false);
+          template.removeClass('default-hidden');
+          configureBackupSource(template);
+          sources_container.append(template);
+        } else {
+          // Update with new info instead
+          let container = existing_sources[source.key];
+          container.data('source', source);
+          configureBackupSource(container);
+        }
+        new_sources.add(source.key);
+      }
+
+      rendered_sources.each(function () {
+        if (!new_sources.has($(this).data('source-name'))) {
+          $(this).remove();
+        }
+      });
+
+      // Render the upload card if needed
+      let upload_card = $('.detail-uploader-info');
+      if (backup.upload_info) {
+        $('.source-name', upload_card).html(backup.upload_info.name);
+        let progress = Math.round(backup.upload_info.progress);
+        let data = progress + "% (" + asSizeString(backup.upload_info.total) + ") - ";
+
+        $('.determinate', upload_card).css("width", progress + "%");
+        if (backup.upload_info.speed != undefined) {
+          data += asSizeString(backup.upload_info.speed) + "/second - ";
+        } else {
+          data += "(determining speed) - ";
+        }
+        data += "Started " + backup.upload_info.started;
+        $('.progress-info', upload_card).html(data);
+        upload_card.removeClass('default-hidden');
+      } else {
+        upload_card.addClass('default-hidden');
+      }
+
+
+      // Render the card the suggests uploadign to HA if necessary
+      if (backup.uploadable && backup.upload_info == null) {
+        $(".upload-reminder").show();
+      } else {
+        $(".upload-reminder").hide();
+      }
+
+      if (backup.restorable) {
+        $("#restore_link").removeClass('default-hidden');
+      } else {
+        $("#restore_link").addClass('default-hidden');
+      }
+
+      if ((backup.haVersion || backup.folders.length + backup.addons.length > 0) && !modal.data('details_shown')) {
+        let content = [];
+        let content_container = $(".details-contents")
+        content_container.html("");
+        if (backup.haVersion) {
+          content_container.append(genContentTemplate("HA Config", `v${backup.haVersion}`, "broken", "folder-home"));
+        }
+        for (var i = 0; i < backup.folders.length; i++) {
+          let slug = backup.folders[i];
+          let folder = "Unknown Folder";
+          let icon = "folder-outline";
+          let subtext = "&nbsp;";
+          if (slug == "share") {
+            folder = "Share Folder";
+            icon = "folder-account"
+          } else if (slug == "ssl") {
+            folder = "SSL Folder";
+            icon = "folder-key";
+          } else if (slug == "addons/local") {
+            folder = "Local Add-on Folder";
+            icon = "folder-pound";
+          } else if (slug == "media") {
+            folder = "Media Folder";
+            icon = "folder-music";
+          } else {
+            folder = slug;
+            icon = "folder-outline";
+          }
+          content_container.append(genContentTemplate(folder, subtext, "broken", icon));
+        }
+
+        for (var i = 0; i < backup.addons.length; i++) {
+          let addon = backup.addons[i];
+          let sub = `v${addon.version} - ${addon.size}`;
+          content_container.append(genContentTemplate(addon.name, sub, `logo/${addon.slug}`, 'puzzle-outline'));
+        }
+        modal.data('details_shown', true);
+        $(".detail-contents-card").removeClass('default-hidden');
+      }
+    }
+
+    function genContentTemplate(name, subtext, image, fallback_icon) {
+      return `
+          <div class='detail-badge col xl3 l4 m4 s6 content-badge' title="${name}">
+            <div class="left">
+              <svg class="content-icon left default-hidden" viewBox="0 0 24 24">
+                <use xlink:href="#${fallback_icon}" />
+              </svg>
+              <img class='left content-logo' src='${image}' onerror='addonImageError(this);''>
+            </div>
+            <div>
+              <span class='truncate detail-name'>${name}</span>
+              <span class='sub'>${subtext}</span>
+            </div>
+          </div>`;
+    }
+
+    function colorizeLog(log) {
+      if (log.includes("WARN")) return `<span class="super-log-warn">${log}</span>`;
+      if (log.includes("INFO")) return `<span class="super-log-info">${log}</span>`;
+      if (log.includes("ERROR")) return `<span class="super-log-error">${log}</span>`;
+      if (log.includes("DEBUG")) return `<span class="super-log-debug">${log}</span>`;
+      return `<span class="super-log-info">${log}</span>`;
+    }
+
+    function showDetails(target) {
+      var backup = $(target).data('backup');
+      if (backup.isPending) {
+        if (backup.super_logs) {
+          let modal = $('#pending_backup_modal');
+          modal.data('slug', backup.slug);
+          modal.data('backup', backup);
+          const logs = backup.super_logs.split('\n');
+          const container = document.getElementById('super_logs_pending_request');
+          logs.forEach(log => {
+            const colorizedLog = colorizeLog(log);
+            container.innerHTML += `${colorizedLog}\n`;
+          });
+          M.Modal.getInstance(document.getElementById('pending_backup_modal')).open();
+          container.scrollTop = container.scrollHeight;
+        }
+        return;
+      }
+
+      let modal = $('#details_modal');
+      modal.data('slug', backup.slug);
+      modal.data('backup', backup);
+      modal.data('details_shown', false);
+      $(".detail-contents-card").addClass('default-hidden');
+
+      var details = backup.details;
+      $("#details_name").html(backup.name);
+      $("#details_name").attr("title", backup.name);
+
+      $("#details_date").html(backup.date);
+      gen_detail = "";
+      if (backup.status_detail) {
+        gen_detail = "Generation " + backup.status_detail[0];
+      }
+      configureDetailBadge('detail-type', backup.type == 'full' ? 'Full Backup' : 'Partial Backup', true);
+      if (backup.haVersion) {
+        $(".detail-ha-version").show();
+        configureDetailBadge('detail-ha-version', "HA v" + backup.haVersion, backup.haVersion);
+      } else {
+        $(".detail-ha-version").hide();
+      }
+      configureDetailBadge('detail-password', "Password Protected", backup.protected);
+      configureDetailBadge('detail-time', backup.date, true);
+      configureDetailBadge('detail-size', backup.size, true);
+      configureDetailBadge('detail-generational', gen_detail, backup.status_detail);
+
+      let sources_container = $('.detail-backup-sources');
+      sources_container.html("");
+      setValuesForBackupUpdate(backup);
+
+      cancelUploadHaClicked();
+
+      $("#download_link").data('backup', backup);
+      cancelEditCommentClick()
+      setInputValue("edit-comment-input", "");
+      M.Modal.getInstance(document.getElementById('details_modal')).open();
+    }
+
+    function editCommentClick() {
+      let modal = $("#details_modal");
+      let backup = modal.data("backup")
+      $(".detail-comment").addClass("default-hidden");
+      setInputValue("edit-comment-input", backup.note);
+      $(".edit-comment-button").addClass("default-hidden");
+      $(".cancel-comment-edit-button").removeClass("default-hidden");
+      $(".save-comment-edit-button").removeClass("default-hidden");
+      $(".detail-edit-comment").removeClass("default-hidden");
+      M.textareaAutoResize($('#edit-comment-input'));
+      M.updateTextFields();
+      $('#edit-comment-input').focus();
+    }
+
+    function cancelEditCommentClick() {
+      $(".detail-comment").removeClass("default-hidden");
+      $(".edit-comment-button").removeClass("default-hidden");
+      $(".cancel-comment-edit-button").addClass("default-hidden");
+      $(".save-comment-edit-button").addClass("default-hidden");
+      $(".detail-edit-comment").addClass("default-hidden");
+      setInputValue("edit-comment-input", "");
+    }
+
+    function saveEditCommentClick() {
+      let modal = $("#details_modal");
+      let backup = modal.data("backup")
+      let comment = $("#edit-comment-input").val();
+
+      data = {
+        'slug': backup.slug,
+        'note': comment
+      };
+      let success = function (info) { editCommentSaveSuccess(backup.slug, comment); };
+      let fail = function (info) { editCommentSaveFailure(); };
+      postJson("note", data, success, fail, "Updating backup... ");
+    }
+
+    function editCommentSaveSuccess(slug, comment) {
+      let modal = $("#details_modal");
+      let backup = modal.data("backup");
+      if (backup.slug == slug) {
+        cancelEditCommentClick();
+        backup.note = comment;
+        $(".detail-comment").html(comment);
+      }
+    }
+
+    function editCommentSaveFailure() {
+    }
+
+    function uploadHaClicked() {
+      let card = $(".upload-reminder");
+      $(".load-ha-button", card).addClass('disabled');
+      $(".load-ha-info", card).addClass('default-hidden');
+      $(".load-ha-confirm-warning", card).removeClass('default-hidden');
+      $(".cancel-load-ha-button", card).removeClass('default-hidden');
+      $(".confirm-load-ha-button", card).removeClass('default-hidden');
+    }
+
+    function cancelUploadHaClicked() {
+      let card = $(".upload-reminder");
+      $(".load-ha-button", card).removeClass('disabled');
+      $(".load-ha-info", card).removeClass('default-hidden');
+      $(".load-ha-confirm-warning", card).addClass('default-hidden');
+      $(".cancel-load-ha-button", card).addClass('default-hidden');
+      $(".confirm-load-ha-button", card).addClass('default-hidden');
+      $(".cancel-load-ha-button", card).removeClass('disabled');
+      $(".confirm-load-ha-button", card).removeClass('disabled');
+    }
+
+    function doUpload() {
+      let modal = $("#details_modal");
+      let backup = modal.data("backup")
+      message = "Uploading '" + backup.name + "'";
+      url = "upload?slug=" + encodeURIComponent(backup.slug);
+      $(".cancel-load-ha-button", modal).addClass('disabled');
+      $(".confirm-load-ha-button", modal).addClass('disabled');
+      postJson(url, {}, function () { refreshstats(); cancelUploadHaClicked(); }, cancelUploadHaClicked, message);
+    }
+
+    function addonImageError(element) {
+      let image = $(element);
+      image.addClass('default-hidden');
+      $(".content-icon", image.closest(".content-badge")).removeClass("default-hidden");
+    }
+
+  </script>
+  <div class="modal-content">
+    <h5 id="details_name" class="truncate-two-lines"></h5>
+    <div class="row">
+      <div class="detail-badge detail-type col s12 m6 l4" title="Backup Type">
+        <i class="material-icons">archive</i>
+        <span class="detail-name"></span>
+      </div>
+      <div class="detail-badge detail-ha-version col s12 m6 l4" title="Home Assistant Version">
+        <i class="material-icons">home</i>
+        <span class="detail-name"></span>
+      </div>
+      <div class="detail-badge detail-password col s12 m6 l4" title="The backup is password protected">
+        <i class="material-icons">vpn_key</i>
+        <span class="detail-name"></span>
+      </div>
+      <div class="detail-badge detail-time col s12 m6 l4" title="When this backup was created">
+        <i class="material-icons">access_time</i>
+        <span class="detail-name"></span>
+      </div>
+      <div class="detail-badge detail-size col s12 m6 l4" title="The size of the backup">
+        <i class="material-icons">sd_card</i>
+        <span class="detail-name"></span>
+      </div>
+      <div class="detail-badge detail-generational col s12 m6 l4"
+        title="This backup is kept because of your generational configuration">
+        <i class="material-icons">date_range</i>
+        <span class="detail-name"></span>
+      </div>
+    </div>
+    <div class="backup_presence_window">
+      This backup is present in:
+      <div class="detail-backup-sources">
+      </div>
+      <div class="card detail-uploader-info">
+        <div class="card-content">
+          Uploading to <span class="source-name">Google Drive</span>
+          <div class="progress">
+            <div class="determinate"></div>
+          </div>
+          <span class="progress-info"></span>
+        </div>
+      </div>
+    </div>
+    <div class='card upload-reminder'>
+      <div class="card-content">
+        <div class="load-ha-info">
+          <p>
+            To see more details about this backup or restore it, you'll need to
+            load it into Home Assistant. You can do that using the button below or by manually
+            copying it from Google Drive into your Home Assistant '/backup' folder using something like the
+            <a href="https://github.com/home-assistant/addons/blob/master/samba/DOCS.md" target="_blank">Samba
+              Addon</a>.
+          <blockquote>
+            Note: This won't restore the backup, it'll just copy the backup archive into a folder on your Home
+            Assistant machine and make it available for restoration.
+          </blockquote>
+          </p>
+        </div>
+        <div class="load-ha-confirm-warning">
+          <p>
+            Before loading this backup please note:
+          <blockquote>
+            <i class="material-icons left" style="font-size: 40px;">disc_full</i>
+            The backup takes up space, maybe a lot of space. Please make sure you have enough disk space in Home
+            Assistant to store the backup, as running out of disk space can make the machine dangerously unstable.
+          </blockquote>
+          <blockquote>
+            <i class="material-icons left" style="font-size: 40px;">lock</i>
+            The uploaded backup will be marked as "Never Delete" in Home Assistant. It won't count toward the limit
+            you've configured for backups kept in Home Assistant and it will never be deleted until you manually
+            tell the addon to do so.
+          </blockquote>
+          </p>
+        </div>
+      </div>
+      <div class="card-action">
+        <a class="btn-flat load-ha-button" onclick="uploadHaClicked();"><i class="material-icons">file_upload</i>Load
+          into Home Assistant</a>
+        <a class="btn-flat danger-btn confirm-load-ha-button" onclick="doUpload();"><i
+            class="material-icons">file_upload</i>Confirm load</a>
+        <a class="btn-flat cancel-load-ha-button" onclick="cancelUploadHaClicked();"><i
+            class="material-icons">close</i>Cancel</a>
+      </div>
+    </div>
+    <div class="row">
+      <span class="detail-comment" style="white-space: pre-wrap"></span>
+      <div class="input-field col s12 detail-edit-comment">
+        <i class="material-icons prefix">comment</i>
+        <textarea class="materialize-textarea edit-comment-input" id="edit-comment-input" name="edit-comment-input"></textarea>
+        <label for="edit-comment-input">Comment</label>
+      </div>
+      <a class="btn-flat edit-comment-button" onclick="editCommentClick();"><i
+        class="material-icons">edit</i>Edit Comment</a>
+      <a class="btn-flat cancel-comment-edit-button" onclick="cancelEditCommentClick();"><i
+        class="material-icons">close</i>Cancel</a>
+      <a class="btn-flat save-comment-edit-button" onclick="saveEditCommentClick();"><i
+        class="material-icons">save</i>Save</a>
+    </div>
+    <div class="detail-contents-card">
+      <h6>Contents</h6>
+      <div class="details-contents row">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a id="download_link" href="#!" onclick="downloadBackup(this);" class="btn-flat">
+      <i class="material-icons">file_download</i>Download
+    </a>
+    <a id="restore_link" href="#!" onclick="restoreClick(this)" class="modal-close btn-flat">
+      <i class="material-icons">input</i>Restore
+    </a>
+    <a id="save_cancel" href="#!" class="modal-close btn-flat"><i class="material-icons">close</i>Close</a>
+  </div>
+</div>

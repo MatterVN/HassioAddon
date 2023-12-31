@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% block head %}
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <title>Home Assistant Google Drive Backup</title>
+
+  <link href="static/{{ version }}/css/icons.css?version={{ version }}" rel="stylesheet">
+  <link href="static/{{ version }}/css/spinner.css?version={{ version }}" rel="stylesheet">
+  <link href="static/{{ version }}/css/materialize.css?version={{ version }}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="static/{{ version }}/css/colpick.css?version={{ version }}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="static/{{ version }}/css/static.css?version={{ version }}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link rel="icon" type="image/png" href="static/{{ version }}/images/favicon.png?version={{ version }}">
+  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
+  <script src="static/{{ version }}/js/URI.js?version={{ version }}"></script>  
+  <script src="static/{{ version }}/js/jquery.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/materialize.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/colpick.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/init.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/scripts.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/settings.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/about.js?version={{ version }}"></script>
+  <script src="static/{{ version }}/js/jquery.qrcode.min.js?version={{ version }}"></script>
+  <style id="theme" type="text/css" data-background-color="{{ backgroundColor }}" data-accent-color="{{ accentColor }}">
+    /* Dynamically created from javascript */
+  </style>
+  <script src="static/{{ version }}/js/theme.js?version={{ version }}"></script>
+  {% endblock %}
+</head>
+
+<body>
+  {% block content %}{% endblock %}
+  
+  {% include 'layouts/partials/footer.jinja2' %}
+
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

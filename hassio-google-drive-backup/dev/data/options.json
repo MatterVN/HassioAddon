@@ -1,0 +1,11 @@
+{
+    "send_error_reports": true,
+    "max_backups_in_ha": 4,
+    "max_backups_in_google_drive": 3,
+    "days_between_backups": 10,
+    "use_ssl": false,
+    "backup_name": "{type} Backup {year}-{month}-{day} {hr24}:{min}:{sec}",
+    "backup_password": "!secret password1",
+    "drive_experimental": true,
+    "drive_ipv4": ""
+}

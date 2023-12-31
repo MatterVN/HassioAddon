@@ -1,0 +1,178 @@
+{% import "layouts/macros.jinja2" as macros %}
+{% extends "layouts/base-server.jinja2" %}
+
+{% block head %}
+  {{ super() }}
+  <script async defer src="https://apis.google.com/js/api.js" onload="onApiLoad()"></script>
+  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  <script type="text/javascript">
+    var clientId = "{{ client_id }}";
+    var appId = "{{ app_id }}";
+    let scope = 'https://www.googleapis.com/auth/drive.file';
+    var picker_redirect = {{ do_redirect }};
+    var pickerApiLoaded = false;
+    let tokenClient = null;
+    let accessToken = null;
+
+
+    function onApiLoad() {
+      gapi.load('picker', () => {pickerInited = true;});
+    }
+
+    function gisLoaded() {
+      
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: scope,
+        callback: '', // defined later
+      });
+      gisInited = true;
+    }
+
+    function loadPicker() {
+      // Request an access token
+      tokenClient.callback = async (response) => {
+        if (response.error !== undefined) {
+          throw (response);
+        }
+        accessToken = response.access_token;
+        buildPicker();
+      };
+
+      if (accessToken === null) {
+        // Prompt the user to select a Google Account and ask for consent to share their data
+        // when establishing a new session.
+        tokenClient.requestAccessToken({prompt: 'consent'});
+      } else {
+        // Skip display of account chooser and consent dialog for an existing session.
+        tokenClient.requestAccessToken({prompt: ''});
+      }
+    }
+
+
+    function handleAuthResult(authResult) {
+      if (authResult && !authResult.error) {
+        oauthToken = authResult.access_token;
+        createPicker();
+      }
+    }
+
+    // Create and render a Picker object for searching images.
+    function buildPicker(builder) {
+        var mydrive = new google.picker.DocsView(google.picker.ViewId.DOCS)
+          .setMode(google.picker.DocsViewMode.LIST)
+          .setIncludeFolders(true)
+          .setSelectFolderEnabled(true)
+          .setParent('root')
+          .setLabel("My Drive");
+        var sharedWithMe = new google.picker.DocsView(google.picker.FOLDERS)
+          .setMode(google.picker.DocsViewMode.LIST)
+          //.setIncludeFolders(true)
+          .setSelectFolderEnabled(true)
+          .setOwnedByMe(true)
+          .setQuery("*")
+          .setLabel("Shared With Me");
+        var sharedDrives = new google.picker.DocsView(google.picker.ViewId.DOCS)
+          .setEnableDrives(true)
+          .setMode(google.picker.DocsViewMode.LIST)
+          .setIncludeFolders(true)
+          .setSelectFolderEnabled(true);
+        var recent = new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED)
+          .setMode(google.picker.DocsViewMode.LIST)
+          .setIncludeFolders(true)
+          .setSelectFolderEnabled(true);
+        var picker = new google.picker.PickerBuilder()
+          .disableFeature(google.picker.Feature.NAV_HIDDEN)
+          .disableFeature(google.picker.Feature.MINE_ONLY)
+          .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
+          .setAppId(appId)
+          .setOAuthToken(accessToken)
+          .addView(mydrive)
+          //.addView(sharedWithMe)
+          .addView(sharedDrives)
+          .addView(recent)
+          .setTitle("Choose a backup folder")
+          .setCallback(pickerCallback)
+          .build();
+        picker.setVisible(true);
+    }
+
+    function getQueryParams(params) {
+      let href = window.location;
+      //this expression is to get the query strings
+      let reg = new RegExp('[?&]' + params + '=([^&#]*)', 'i');
+      let queryString = reg.exec(href);
+      return queryString ? queryString[1] : null;
+    };
+
+    // A simple callback implementation.
+    function pickerCallback(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        var message = "";
+        if (data.docs.length == 0) {
+          message = "No document was selected.  Please try selecting a folder again."
+        } else if (data.docs[0].mimeType != "application/vnd.google-apps.folder") {
+          // Has to be a folder.  Doesn't make sense otherwise.
+          message = "You can only upload backups to a folder.  Please select a folder instead."
+        }
+
+        if (message.length > 0) {
+          alert(message);
+        } else if(picker_redirect) {
+          // Redirect back to the uer's home assistant with the now authorized folder id.
+          window.location.href = decodeURIComponent(getQueryParams("returnto")) + "?id=" + data.docs[0].id
+        } else {
+          $("#drive_folder_name").html(data.docs[0].name);
+          $("#drive_folder_id").val(data.docs[0].id);
+          $("#copy_folder_card").show();
+        }
+      }
+    }
+  </script>
+{% endblock %}
+{% block content %}
+  {% call macros.header(version) %}{% endcall %}
+  <main>
+    <div class="container">
+      <div class="section">
+      <div class="row" id="hello_card">
+          <div class="col s12 m9">
+              <div class="card">
+                  <div class="card-content">
+                      <span class="card-title">Backup Folder Picker</span>
+                      <p>Use the button below to log into your google account and select a folder from your Google Drive.
+                      <ul class="browser-default">
+                        <li>The button opens a pop-up that creates a session with Google's services and then redirects back here.  If your browser has extensions that prevent that kind of thing (eg aggressive pop-up blockers, cross-site cookie restriction, Firefox containers, etc) then you might need to disable them to make the authorization work.  This is just how Google does authorization.</li>
+                        <li>If the folder you want to use doesn't exist yet, navigate to <a href="https://drive.google.com" target="_blank">Google Drive</a> and create it there first.  The folder picker doesn't let you create new folders.</li>
+                        <li>The folder you select is where the addon will store backups from now on.  This should be what you want if you're on this page.</li>
+                        <li>If you'd like to know why this page has to be hosted on an external domain, <a target="_blank" href="https://github.com/sabeechen/hassio-google-drive-backup/blob/master/hassio-google-drive-backup/AUTHENTICATION.md">click here to learn more</a>.</li>
+                      </ul>
+                      </p>
+                      <div class="card-action">
+                          <a target="_blank" class="btn-flat" onclick="loadPicker();">Choose Folder</a>
+                      </div>
+                  </div>
+              </div>
+              <div class="card" id="copy_folder_card" style="display: none;">
+                <div class="card-content">
+                    <span class="card-title">Folder Chosen</span>
+                    <p>Below is the ID of the folder you chose, "<span id="drive_folder_name"></span>".  Copy this ID back into the settings dialog that brought you here 
+                      to start syncing backups into it.  You can close this window once its saved.
+                      <br>
+                      <textarea readonly id="drive_folder_id">
+                      </textarea>
+                    </p>
+                    <div class="card-action">
+                      <a id="copy_button" onclick="copyFromInput('drive_folder_id')" class="btn-flat">
+                        <i class="material-icons">content_copy</i>Copy
+                      </a>
+                    </div>
+                </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    </div>
+  </main>
+{% endblock %}
+

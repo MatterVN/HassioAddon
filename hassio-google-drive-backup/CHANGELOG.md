@@ -1,46 +1,43 @@
-## v0.110.4
-Fixes an issue causing authentication to fail because of whitespace on the latest Home Assistant core.
-## v0.110.3
-Fix an error causing "Days Between Backups" to be ignored when "Time of Day" for a backup is set.
-Fix a bug causing some timezones to make the addon to fail to start.
-## 0.110.2
-Changes:
-Fix a potential cause of SSL errors when communicating with Google Drive
-Fix a bug causing backups to be requested indefinitely if scheduled during DST transitions.
-## v0.109.2 [2022-11-16]
-Fixes a bug causing backups in Google Drive to be erroneously deleted when "Max Backups in Google Drive" is 0 and "Delete After Upload" is enabled.
+## v0.112.1 [2023-11-03]
 
-## v0.108.4 [2022-08-22]
-Fixed an error causing "Undefined" to show up for addon descriptions.
-Fixed an error preventing addon thumbnails from showing up.
-Fixed an error causing username/password authentication to fail.
+- Added warnings about using the "Stop Addons" feature.  I plan on removing this in the near future.  If you'd like to keep the feature around, please give your feedback in [this GitHub issue](https://github.com/sabeechen/hassio-google-drive-backup/issues/940).
+- When backups are stuck in the "pending" state, the addon now provides you with the Supervisor logs to help figure out whats wrong.
+- Added support for the "exclude Home Assistant database" options for automatic backups
+- Added configuration options to limit the speed of uploads to Google Drive
+- When Google Drive doesn't have enough space, the addon now explains how much space you're using and how much is left.  This was a source of confusion for users.
+- When the addon halts because it needs to delete more than one backup, it now tells you which backups will be deleted.
+- Fixed a bug when using "stop addons" that prevented it from recognizing addons in the "starting" state.
+- The addon's containers are now donwloaded from Github (previously was DockerHub)
+- Added another redundant token provider, hosted on heroku, that the addon uses for its cloud-required component when you aren't using your own google app credentials.
 
-## v0.108.3 [2022-08-16]
-Fixed an error preventing stopped addons form being started if they hit errors while stopping.
-Fixed many, many, many gramatical errors thanks to @markvader's #665.
-Fixed a missing config option in the addon schema, maximum_upload_chunk_bytes.
+## v0.111.1 [2023-06-19]
 
-## v0.108.2 [2022-06-03]
-Switched to ignoring 'upgrade' backups by default for new users.
-Added a warning for existing users if you're not ignoring upgrade backups.
-Added a warning about google's OOB deprecation for private credential users.
+- Support for the new network storage features in Home Assistant.  The addon will now create backups in what Home Assistant has configured as its default backup location.  This can be overridden in the addon's settings.
+- Raised the addon's required permissions to "Admin" in order to access the supervisor's mount API.
+- Fixed a CSS error causing toast messages to render partially off screen on small displays.
+- Fixed misreporting of some error codes from Google Drive when a partial upload can't be resumed.
 
-## v0.108.1 [2022-06-02]
-Added commenting on backups, ie you can annotate them before or after creation.
-Fixed layout gaps in the backup details page
+## v0.110.4 [2023-04-28]
 
-## v0.107.3 [2022-05-30]
-Fixed an issue causing ignored backups to get labelled as generational backups.
+- Fix a whitespace error causing authorization to fail.
 
-## [0.106.2 2022-3-23]
-### New
-* Added "next_backup" to published sensors.
-* Added upload chunk size config option to debug connectivity issues. 
+## v0.110.3 [2023-03-24]
 
-## [0.106.1 2022-3-21]
-### Fixes
-* Updates the mechanism for using custom/personal Google API credentials to work with Google's newer APIs
-* Fixes a problem that prevented loading backups from Google Drive -> Home Assistant through the Nabu Casa remote UI
+- Fix an error causing "Days Between Backups" to be ignored when "Time of Day" for a backup is set.
+- Fix a bug causing some timezones to make the addon to fail to start.
 
-### New
-* Added the ability to delete any "ignored" snapshots after a certain age.
+## v0.110.2 [2023-03-24]
+
+- Fix a potential cause of SSL errors when communicating with Google Drive
+- Fix a bug causing backups to be requested indefinitely if scheduled during DST transitions.
+
+## v0.110.1 [2023-01-09]
+
+- Adds some additional options for donating
+- Mitgigates SD card corruption by redundantly storing config files needed for addon startup.
+- Avoid global throttling of Google Drive API calls by:
+  - Making sync intervals more spread out and a little random.
+  - Syncing more selectively when there are modifications to the /backup directory.
+  - Caching data from Google Drive for short periods during periodic syncing.
+  - Backing off for a longer time (2 hours) when the addon hits permanent errors.
+- Fixes CSS issues that made the logs page hard to use.

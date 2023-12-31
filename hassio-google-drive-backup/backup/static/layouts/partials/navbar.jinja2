@@ -1,0 +1,131 @@
+{% import "layouts/macros.jinja2" as macros %}
+
+{% if coordEnabled %}
+{% include 'layouts/partials/modals/backup/delete.jinja2' %}
+{% include 'layouts/partials/modals/backup/new.jinja2' %}
+{% include 'layouts/partials/modals/backup/upload.jinja2' %}
+{% include 'layouts/partials/modals/backup/details.jinja2' %}
+{% endif %}
+
+{% include 'layouts/partials/modals/settings.jinja2' %}
+{% include 'layouts/partials/modals/help.jinja2' %}
+{% include 'layouts/partials/modals/bug.jinja2' %}
+{% include 'layouts/partials/modals/about.jinja2' %}
+{% include 'layouts/partials/modals/about.jinja2' %}
+{% include 'layouts/partials/modals/crypto_donate.jinja2' %}
+{% include 'layouts/partials/modals/pending_backup_info.jinja2' %}
+
+{% if coordEnabled %}
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#deletemodal').modal();
+    $('#backupmodal').modal();
+    $('#uploadmodal').modal();
+    $('#details_modal').modal();
+  });
+</script>
+{% endif %}
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#settings_modal').modal({
+      dismissible: false
+    });
+    $('#help_modal').modal();
+    $('#bug_modal').modal();
+    $('#details_modal').modal();
+    $('.tooltipped').tooltip();
+    $('.collapsible').collapsible();
+    $('.sidenav').sidenav();
+    $('.fixed-action-btn').floatingActionButton();
+    $('#pending_backup_modal').modal();
+
+    const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
+    const instances = M.Dropdown.init(dropdownTriggers, { 'constrainWidth': false });
+  });
+</script>
+
+
+{% macro actionMenu(id) %}
+<ul id="{{ id }}" class="dropdown-content">
+  {% if coordEnabled %}
+    {% if showOpenDriveLink %}
+    <li>
+      <a onclick="newBackupClick(); return false;" style="cursor: pointer">
+        <i class="material-icons left">add</i>Backup Now
+      </a>
+    </li>
+    <li>
+      <a onclick="sync('error_card')" style="cursor: pointer"><i class="material-icons left">autorenew</i>Sync Now</a>
+    </li>
+    <li class="open_drive_menu default-hidden" ><a class="open_drive_link" target="_blank"><i class="material-icons">cloud</i>Open Drive Backups</a></li>
+    {% endif %}
+    <li><a href="reauthenticate"><i class="material-icons">vpn_key</i>Reauthorize Google Drive</a></li>
+  {% endif %}
+  <li><a onclick="bugReport()" style="cursor: pointer"><i class="material-icons">bug_report</i>Report a bug</a></li>
+  <li><a href="#!" class="modal-trigger" data-target="about_modal"><i class="material-icons">info</i>About</a></li>
+</ul>
+{% endmacro %}
+
+{% call macros.header(version, navBarTitle) %}
+<a href="#" data-target="mobile-menu" class="sidenav-trigger non-ingress">
+  <i class="material-icons">menu</i>
+</a>
+<ul class="right">
+  <li>
+    <a href="#!" onClick="loadSettings()">
+      <i class="material-icons" style="display: inline; margin-right: 5px; vertical-align: bottom">settings</i>
+      Settings
+    </a>
+  </li>
+  <li>
+    <a href="log?format=view" target="_blank" rel="noreferrer">
+      <i class="material-icons" style="display: inline; margin-right: 5px; vertical-align: bottom">code</i>
+      Logs
+    </a>
+  </li>
+  <li>
+    <a href="#!" class="modal-trigger" data-target="help_modal">
+      <i class="material-icons" style="display: inline; margin-right: 5px; vertical-align: bottom">help</i>
+      Get Help
+    </a>
+  </li>
+  <li>
+    {{ actionMenu(id="main_menu_dropdown") }}
+    <a class="dropdown-trigger" href="#!" data-target="main_menu_dropdown">
+      Actions <i class="material-icons right">arrow_drop_down</i>
+    </a>
+  </li>
+</ul>
+
+{% endcall %}
+
+<ul class="sidenav non-ingress" id="mobile-menu">
+  <div class="sidenav-header">
+    <img src="static/{{ version }}/images/logo.png" width="120" />
+  </div>
+  <li><a href="#!" onClick="loadSettings()"><i class="material-icons">settings</i>Settings</a></li>
+  <li><a href="log?format=view" target="_blank" rel="noreferrer"><i class="material-icons">code</i>Logs</a></li>
+  {% if coordEnabled %}
+    {% if showOpenDriveLink %}
+      <li>
+        <a onclick="newBackupClick(); return false;" style="cursor: pointer">
+          <i class="material-icons left">add</i>Backup Now</a>
+      </li>
+      <li><a onclick="sync()" style="cursor: pointer"><i class="material-icons left">autorenew</i>Sync Now</a></li>
+      <li class="open_drive_menu"><a class="open_drive_link" target="_blank"><i class="material-icons">cloud</i>Open Drive Backups</a></li>
+    {% endif %}
+    <li><a href="reauthenticate"><i class="material-icons">vpn_key</i>Reauthorize Google Drive</a></li>
+  {% endif %}
+  <li><a href="#!" data-target="help_modal" class="modal-trigger"><i class="material-icons">help</i>Get Help</a></li>
+  <li><a onclick="bugReport()" style="cursor: pointer"><i class="material-icons">bug_report</i>Report a bug</a></li>
+  <li><a href="#!" class="modal-trigger" data-target="about_modal"><i class="material-icons">info</i>About</a></li>
+</ul>
+
+{% if coordEnabled and showOpenDriveLink %}
+<div class="fixed-action-btn">
+  <a onclick="newBackupClick(); return false;" class="btn-floating btn-large tooltipped" data-position="left" data-tooltip="Backup Now">
+    <i class="large material-icons">add</i>
+  </a>
+</div>
+{% endif %}
