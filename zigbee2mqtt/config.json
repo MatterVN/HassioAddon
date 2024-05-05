@@ -1,6 +1,6 @@
 {
   "name": "Zigbee2MQTT",
-  "version": "1.36.0-1",
+  "version": "1.37.0-1",
   "slug": "zigbee2mqtt",
   "description": "Use your ZigBee devices without the vendor's bridge or gateway",
   "uart": true,
@@ -46,7 +46,6 @@
     "serial": {}
   },
   "schema": {
-    "zigbee_herdsman_debug": "bool?",
     "data_path": "str",
     "socat": {
       "enabled": "bool?",
