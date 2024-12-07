@@ -5,18 +5,22 @@ By default the add-on has `permit_join` set to `false`. To allow devices to join
 Enable `ingress` to have the frontend available in your UI: **Settings → Add-ons → Zigbee2MQTT → Show in sidebar**. You can find more details about the feature on the [Zigbee2MQTT documentation](https://www.zigbee2mqtt.io/information/frontend.html).
 
 # Configuration
-Configuration required to startup Zigbee2MQTT is available from the addon configuration. The rest of the options can be configured via the Zigbee2MQTT frontend.
+Configuration required to startup Zigbee2MQTT is available from the add-on configuration. The rest of the options can be configured via the Zigbee2MQTT frontend.
+
+**CAUTION:** settings configured through the add-on configuration page will take precedence over settings in the `configuration.yaml` page (e.g. you set `rtscts: false` in add-on configuration page and `rtscts: true` in `configuration.yaml`, `rtscts: false` will be used). _If you want to control the entire configuration through YAML, remove them from the add-on configuration page._
 
 # Configuration backup
 The add-on will create a backup of your configuration.yml within your data path: `$DATA_PATH/configuration.yaml.bk`. When upgrading, you should use this to fill in the relevant values into your new config, particularly the network key, to avoid breaking your network and having to repair all of your devices.
 The backup of your configuration is created on add-on startup if no previous backup was found. 
 
-# Enabling zigbee-herdsman debug logging
-If you want to troubleshoot in more depth problems with your zigbee devices, sometimes you must enable DEBUG option on Zigbee2MQTT startup. To do this you must set `zigbee_herdsman_debug` to `true`.
+# Enabling the watchdog
+To automatically restart Zigbee2MQTT in case of a soft failure (like "adapter disconnected"), the watchdog can be used. It can be enabled by adding the following to the add-on configuration:
 
 ```yaml
-zigbee_herdsman_debug: true
+watchdog: default
 ```
+
+This will use the default watchdog retry delays of 1min, 5min, 15min, 30min, 60min. Custom delays are also supported, e.g. `watchdog: 5,10,30` will start Zigbee2MQTT with the watchdog's retry delays of 5min, 10min, 30min. For more information about the watchdog, read the [docs](https://www.zigbee2mqtt.io/guide/installation/15_watchdog.html).
 
 # Adding Support for New Devices
 If you are interested in adding support for new devices to Zigbee2MQTT see [How to support new devices](https://www.zigbee2mqtt.io/how_tos/how_to_support_new_devices.html).
